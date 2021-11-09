@@ -117,7 +117,6 @@ def get_rdf(html_source):
         str(html_source), syntaxes=["microdata", "rdfa", "json-ld"], errors="ignore"
     )
     print(data)
-    print("ici")
     kg = ConjunctiveGraph()
 
     # kg = util.get_rdf_selenium(uri, kg)

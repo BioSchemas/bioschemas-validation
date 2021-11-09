@@ -58,6 +58,30 @@ class GenSHACLTestCase(unittest.TestCase):
             shacl_shape=shape,
         )
 
+    def test_generate_shape_gene(self):
+        classes = ["sc:Gene"]
+        minimal_dataset_properties = [
+            'sc:identifier',
+            'sc:name',
+            # 'dct:conformsTo'
+        ]
+        recommended_dataset_properties = [
+            'sc:description',
+            'sc:encodesBioChemEntity',
+            'sc:isPartOfBioChemEntity',
+            'sc:url'
+        ]
+        shape = gen_SHACL_from_profile(
+            "geneShape",
+            target_classes=classes,
+            min_props=minimal_dataset_properties,
+            rec_props=recommended_dataset_properties,
+        )
+        validate_shape_from_microdata(
+            input_uri="https://bgee.org/?page=gene&gene_id=ENSMUSG00000038170",
+            shacl_shape=shape,
+        )
+
     def test_generate_right_shape(self):
         target_class = "sc:SoftwareApplication"
         shape = gen_SHACL_from_target_class(target_class=target_class)
