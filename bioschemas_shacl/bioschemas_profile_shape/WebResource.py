@@ -41,10 +41,7 @@ class WebResource:
         html_source = response.content
 
         data = extruct.extract(
-            html_source, syntaxes=["microdata", "rdfa", "json-ld"], errors="ignore",
-            #html_source,
-            #syntaxes=["rdfa", "json-ld"],
-            #errors="ignore",
+            html_source, syntaxes=["microdata", "rdfa", "json-ld"], errors="ignore"
         )
         print(data)
         kg = ConjunctiveGraph()
@@ -67,13 +64,13 @@ class WebResource:
                 ):
                     md["@context"] = static_file_path
             kg.parse(data=json.dumps(md, ensure_ascii=False), format="json-ld")
-        # for md in data["microdata"]:
-        #     if "@context" in md.keys():
-        #         if ("https://schema.org" in md["@context"]) or (
-        #             "http://schema.org" in md["@context"]
-        #         ):
-        #             md["@context"] = static_file_path
-        #     kg.parse(data=json.dumps(md, ensure_ascii=False), format="json-ld")
+        for md in data["microdata"]:
+            if "@context" in md.keys():
+                if ("https://schema.org" in md["@context"]) or (
+                    "http://schema.org" in md["@context"]
+                ):
+                    md["@context"] = static_file_path
+            kg.parse(data=json.dumps(md, ensure_ascii=False), format="json-ld")
 
         logging.debug(kg.serialize(format="turtle"))
         return kg
@@ -86,7 +83,7 @@ class WebResource:
         browser.get(url)
         # self.html_source = browser.page_source
         # browser.quit()
-        logging.debug(type(browser.page_source))
+        # logging.debug(type(browser.page_source))
 
         try:
             element = browser.find_element_by_xpath(
@@ -129,13 +126,16 @@ class WebResource:
                     )
 
                 print(f"{len(kg)} retrieved triples in KG")
-                print(kg.serialize(format="turtle"))
+                logging.debug(kg.serialize(format="turtle"))
 
         except NoSuchElementException:
             logging.warning('Can\'t find "application/ld+json" content')
-            pass
+            # print('Can\'t find "application/ld+json" content')
+            # print()
+            # browser.quit()
+            return kg
 
-        browser.quit()
+        # browser.quit()
         return kg
 
     def __init__(self, url) -> None:
@@ -143,9 +143,9 @@ class WebResource:
         # get dynamic RDF metadata (generated from JS)
         kg_1 = WebResource.extract_rdf_selenium(self.url)
         # get static RDF metadata (already available in html sources)
-        # kg_2 = WebResource.extract_rdf_extruct(self.url)
-        # self.rdf = kg_1 + kg_2
-        self.rdf = kg_1
+        kg_2 = WebResource.extract_rdf_extruct(self.url)
+        self.rdf = kg_1 + kg_2
+        # self.rdf = kg_2
 
     def get_url(self):
         return self.url
@@ -154,5 +154,5 @@ class WebResource:
         return self.rdf
 
     def __str__(self) -> str:
-        out = f"Web resource under FAIR assesment:\n\t- {self.url} \n\t- {len(self.rdf)} embedded RDF triples"
+        out = f"Web resource under Bioschemas validation:\n\t- {self.url} \n\t- {len(self.rdf)} embedded RDF triples"
         return out

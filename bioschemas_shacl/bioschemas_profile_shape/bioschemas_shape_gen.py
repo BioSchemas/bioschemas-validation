@@ -5,6 +5,7 @@ from pyshacl import validate
 
 from bioschemas_profile_shape.WebResource import WebResource
 
+
 class BioschemasProfileError(Exception):
     def __init__(self, class_name, message="The profile is yet defined"):
         self.class_name = class_name
@@ -182,7 +183,7 @@ def validate_any_from_KG(kg):
     kg.namespace_manager.bind("sc", URIRef("http://schema.org/"))
     kg.namespace_manager.bind("bsc", URIRef("https://bioschemas.org/"))
     print(len(kg))
-    print(kg.serialize(format="turtle").decode())
+    print(kg.serialize(format="turtle"))
 
     results = {}
 
@@ -237,14 +238,18 @@ def validate_any_from_microdata(input_url):
     kg.namespace_manager.bind("dct", URIRef("http://purl.org/dc/terms/"))
 
     results = {}
-    print(kg.serialize(format="turtle").decode())
+    # print(kg.serialize(format="turtle"))
 
     # list classes
     for s, p, o in kg.triples((None, RDF.type, None)):
         print(f"{s.n3(kg.namespace_manager)} is a {o.n3(kg.namespace_manager)}")
+        # print(o.n3(kg.namespace_manager))
+        # print(bs_profiles.keys())
+
         if o.n3(kg.namespace_manager) in bs_profiles.keys():
             print(f"Trying to validate {s} as a(n) {o} resource")
             shacl_shape = gen_SHACL_from_target_class(o.n3(kg.namespace_manager))
+            # print(shacl_shape)
             warnings, errors = validate_shape(
                 knowledge_graph=kg, shacl_shape=shacl_shape
             )
@@ -253,6 +258,8 @@ def validate_any_from_microdata(input_url):
                 "warnings": warnings,
                 "errors": errors,
             }
+        else:
+            print(f"Could not find a suitable profile for {s} typed {o}")
     print(len(kg))
     return results
 
@@ -266,13 +273,11 @@ def validate_shape_from_RDF(input_uri, rdf_syntax, shacl_shape):
 
 def validate_shape_from_microdata(input_uri, shacl_shape):
     kg = WebResource(input_uri).get_rdf()
-    print(kg.serialize(format="turtle").decode())
     warnings, errors = validate_shape(knowledge_graph=kg, shacl_shape=shacl_shape)
     return warnings, errors
 
 
 def validate_shape(knowledge_graph, shacl_shape):
-    # print(knowledge_graph.serialize(format="turtle").decode())
     r = validate(
         data_graph=knowledge_graph,
         data_graph_format="turtle",
@@ -281,7 +286,7 @@ def validate_shape(knowledge_graph, shacl_shape):
         shacl_graph_format="turtle",
         ont_graph=None,
         inference="rdfs",
-        abort_on_error=False,
+        abort_on_first=False,
         meta_shacl=False,
         debug=False,
     )
@@ -303,15 +308,15 @@ def validate_shape(knowledge_graph, shacl_shape):
     # print('VALIDATION RESULTS')
     # print(results_text)
     # print(conforms)
-    # print(results_graph.serialize(format="turtle").decode())
+    # print(results_graph.serialize(format="turtle"))
     warnings = []
     errors = []
     for r in results:
         if "#Warning" in r["severity"]:
             print(f'WARNING: Property {r["path"]} should be provided for {r["node"]}')
-            warnings.append(f'{r["path"]}')
+            warnings.append(f'{r["path"]} for {r["node"]}')
         if "#Violation" in r["severity"]:
             print(f'ERROR: Property {r["path"]} must be provided for {r["node"]}')
-            errors.append(f'{r["path"]}')
+            errors.append(f'{r["path"]} for {r["node"]}')
 
     return warnings, errors

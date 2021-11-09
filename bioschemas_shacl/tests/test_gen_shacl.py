@@ -1,12 +1,11 @@
 import unittest
 
-from bioschemas_shacl.bioschemas_profile_shape.bioschemas_shape_gen import gen_SHACL_from_profile
-from bioschemas_shacl.bioschemas_profile_shape.bioschemas_shape_gen import gen_SHACL_from_target_class
-from bioschemas_shacl.bioschemas_profile_shape.bioschemas_shape_gen import validate_shape_from_RDF
-from bioschemas_shacl.bioschemas_profile_shape.bioschemas_shape_gen import validate_any_from_RDF
-from bioschemas_shacl.bioschemas_profile_shape.bioschemas_shape_gen import validate_any_from_microdata
-from bioschemas_shacl.bioschemas_profile_shape.bioschemas_shape_gen import validate_shape_from_microdata
-
+from bioschemas_profile_shape.bioschemas_shape_gen import gen_SHACL_from_profile
+from bioschemas_profile_shape.bioschemas_shape_gen import gen_SHACL_from_target_class
+from bioschemas_profile_shape.bioschemas_shape_gen import validate_shape_from_RDF
+from bioschemas_profile_shape.bioschemas_shape_gen import validate_any_from_RDF
+from bioschemas_profile_shape.bioschemas_shape_gen import validate_any_from_microdata
+from bioschemas_profile_shape.bioschemas_shape_gen import validate_shape_from_microdata
 
 
 class GenSHACLTestCase(unittest.TestCase):
@@ -59,17 +58,13 @@ class GenSHACLTestCase(unittest.TestCase):
         )
 
     def test_generate_shape_gene(self):
-        classes = ["sc:Gene"]
-        minimal_dataset_properties = [
-            'sc:identifier',
-            'sc:name',
-            # 'dct:conformsTo'
-        ]
+        classes = ["bsc:Gene"]
+        minimal_dataset_properties = ["sc:identifier", "sc:name", "dct:conformsTo"]
         recommended_dataset_properties = [
-            'sc:description',
-            'sc:encodesBioChemEntity',
-            'sc:isPartOfBioChemEntity',
-            'sc:url'
+            "sc:description",
+            "sc:encodesBioChemEntity",
+            "sc:isPartOfBioChemEntity",
+            "sc:url",
         ]
         shape = gen_SHACL_from_profile(
             "geneShape",
@@ -93,20 +88,37 @@ class GenSHACLTestCase(unittest.TestCase):
 
     def test_any_resource(self):
         # todo assertions on error count for each test
-        validate_any_from_RDF(
-            input_url="https://bio.tools/api/jaspar?format=jsonld", rdf_syntax="json-ld"
-        )
-        validate_any_from_microdata(
-            input_url="https://data.inrae.fr/dataset.xhtml?persistentId=doi:10.15454/PL3HWQ"
-        )
-        # todo assertions : no errors
-        validate_any_from_microdata(
-            input_url="https://doi.pangaea.de/10.1594/PANGAEA.914331"
-        )
+        # validate_any_from_RDF(
+        #     input_url="https://bio.tools/api/jaspar?format=jsonld", rdf_syntax="json-ld"
+        # )
+        # validate_any_from_microdata(
+        #     input_url="https://bio.tools/jaspar"
+        # )
+
+        # TODO issue with schema.org url in @context
+        # validate_any_from_RDF(
+        #     input_url="https://data.inrae.fr/api/datasets/export?exporter=schema.org&persistentId=doi%3A10.15454/PL3HWQ", rdf_syntax="json-ld"
+        # )
+
+        # TODO cannot find any embedded JSONLD
+        # validate_any_from_microdata(
+        #     input_url="https://data.inrae.fr/dataset.xhtml?persistentId=doi:10.15454/PL3HWQ"
+        # )
+
+        # res = validate_any_from_microdata(
+        #     input_url="https://doi.pangaea.de/10.1594/PANGAEA.914331"
+        # )
+        # print(res)
+
+        # res = validate_any_from_microdata(
+        #     input_url="https://search.datacite.org/works/10.7892/boris.108387"
+        # )
+        # print(res)
+
         res = validate_any_from_microdata(
-            input_url="https://search.datacite.org/works/10.7892/boris.108387"
+            # input_url="https://bgee.org/?page=gene&gene_id=ENSMUSG00000038170"
+            input_url="https://bgee.org/?page=gene&gene_id=ENSG00000274928"
         )
-        print(res)
 
 
 if __name__ == "__main__":
