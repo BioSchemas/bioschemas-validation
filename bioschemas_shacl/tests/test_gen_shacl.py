@@ -1,4 +1,11 @@
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__),'../'))
+
 import unittest
+
+from os import walk
+import json
 
 from bioschemas_profile_shape.bioschemas_shape_gen import gen_SHACL_from_profile
 from bioschemas_profile_shape.bioschemas_shape_gen import gen_SHACL_from_target_class
@@ -6,6 +13,7 @@ from bioschemas_profile_shape.bioschemas_shape_gen import validate_shape_from_RD
 from bioschemas_profile_shape.bioschemas_shape_gen import validate_any_from_RDF
 from bioschemas_profile_shape.bioschemas_shape_gen import validate_any_from_microdata
 from bioschemas_profile_shape.bioschemas_shape_gen import validate_shape_from_microdata
+
 
 
 class GenSHACLTestCase(unittest.TestCase):
@@ -119,6 +127,37 @@ class GenSHACLTestCase(unittest.TestCase):
             # input_url="https://bgee.org/?page=gene&gene_id=ENSMUSG00000038170"
             input_url="https://bgee.org/?page=gene&gene_id=ENSG00000274928"
         )
+
+    def test_read_profiles_from_files(self):
+        profile_files = []
+
+        # get list of path of .json bioschemas profiles
+        dir_path = os.path.join(os.path.dirname(__file__), '../data/specifications')
+        for (sub_dir_path, dirnames, filenames) in walk(dir_path):
+            # print(dirnames)
+
+            for (dirpath, dirnames, filenames) in walk(sub_dir_path):
+                for filename in filenames:
+                    if filename.endswith("RELEASE.json"):
+                        profile_files.append(dirpath + "/" + filename)
+                        print(dirpath + "/" + filename)
+            break
+
+
+        #retrieve and parse content of .json profiles files
+        for profile_file in profile_files:
+            print("****** READING Profile *******")
+            print(profile_file)
+            with open(profile_file) as f:
+                profile = json.load(f)
+                # print(json.dumps(profile, indent=True))
+                for g in profile["@graph"]:
+                    if ("$validation") in g.keys():
+                        for k in g["$validation"]["required"]:
+                            print(f"required {k}")
+                        if "recommended" in g["$validation"].keys():
+                            for k in g["$validation"]["recommended"]:
+                                print(f"recommended {k}")
 
 
 if __name__ == "__main__":
