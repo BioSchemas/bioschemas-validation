@@ -1,0 +1,3 @@
+[submodule "bioschemas_shacl/data/specifications"]
+	path = bioschemas_shacl/data/specifications
+	url = https://github.com/BioSchemas/specifications.git
