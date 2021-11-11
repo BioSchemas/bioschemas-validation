@@ -115,9 +115,20 @@ class GenSHACLTestCase(unittest.TestCase):
         # )
         # print(res)
 
+        # res = validate_any_from_microdata(
+        #     # input_url="https://bgee.org/?page=gene&gene_id=ENSMUSG00000038170"
+        #     input_url="https://bgee.org/?page=gene&gene_id=ENSG00000274928"
+        # )
+
+        #
+
+        # res = validate_any_from_microdata(
+        #     # input_url="https://bgee.org/?page=gene&gene_id=ENSMUSG00000038170"
+        #     input_url="https://pippa.psb.ugent.be/pippa_experiments/consult_experiment_basic_info/55"
+        # )
+
         res = validate_any_from_microdata(
-            # input_url="https://bgee.org/?page=gene&gene_id=ENSMUSG00000038170"
-            input_url="https://bgee.org/?page=gene&gene_id=ENSG00000274928"
+            input_url="https://bedroesb.github.io/rdmkit/human_data.html"
         )
 
 
