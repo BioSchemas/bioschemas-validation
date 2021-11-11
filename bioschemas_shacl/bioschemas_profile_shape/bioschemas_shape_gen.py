@@ -3,6 +3,10 @@ from rdflib.namespace import RDF
 from jinja2 import Template
 from pyshacl import validate
 
+import os
+from os import walk
+import json
+
 from bioschemas_profile_shape.WebResource import WebResource
 
 
@@ -15,6 +19,54 @@ class BioschemasProfileError(Exception):
     def __str__(self):
         return f"{self.class_name} -> {self.message}"
 
+def generate_profiles_from_files():
+    profile_files = []
+
+    # get list of path of .json bioschemas profiles
+    dir_path = os.path.join(os.path.dirname(__file__), '../data/specifications')
+    for (sub_dir_path, dirnames, filenames) in walk(dir_path):
+        # print(dirnames)
+
+        for (dirpath, dirnames, filenames) in walk(sub_dir_path):
+            for filename in filenames:
+                if filename.endswith("RELEASE.json"):
+                    profile_files.append(dirpath + "/" + filename)
+                    # print(dirpath + "/" + filename)
+        break
+
+    bs_profiles = {}
+    #retrieve and parse content of .json profiles files
+    for profile_file in profile_files:
+        # print("****** READING Profile *******")
+        # print(profile_file)
+        with open(profile_file) as f:
+            profile = json.load(f)
+            # print(json.dumps(profile, indent=True))
+
+            bs_id = profile["@graph"][0]["@id"]
+            bs_id = "sc:" + profile["@graph"][0]["rdfs:label"]
+            bs_id = profile["@graph"][0]["rdfs:subClassOf"]["@id"]
+            print("*** Storing profile: " + bs_id)
+            # print("rdfs:label = " + profile["@graph"][0]["rdfs:label"])
+            # print("rdfs:subClassOf = " + profile["@graph"][0]["rdfs:subClassOf"]["@id"])
+            bs_profiles[bs_id] = {
+                "min_props": [],
+                "rec_props": []
+            }
+            for g in profile["@graph"]:
+                # print("*** Class: " + g["@id"])
+                # schema_class = g["@id"]
+
+
+                if ("$validation") in g.keys():
+                    for k in g["$validation"]["required"]:
+                        # print(f"required {k}")
+                        bs_profiles[bs_id]["min_props"].append("sc:" + k)
+                    if "recommended" in g["$validation"].keys():
+                        for k in g["$validation"]["recommended"]:
+                            # print(f"recommended {k}")
+                            bs_profiles[bs_id]["rec_props"].append("sc:" + k)
+    return bs_profiles
 
 bs_profiles = {
     "sc:SoftwareApplication": {
@@ -91,6 +143,7 @@ bs_profiles = {
     },
 }
 
+bs_profiles = generate_profiles_from_files()
 
 def checktype(obj):
     # This if statement makes sure input is a list that is not empty
