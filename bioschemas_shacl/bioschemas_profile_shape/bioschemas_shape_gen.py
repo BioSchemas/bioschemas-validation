@@ -57,6 +57,30 @@ def generate_profiles_from_files():
                             bs_profiles[bs_id]["rec_props"].append("schema:" + k)
     return bs_profiles
 
+def gen_shacl_alternatives(bs_profiles):
+    res = {}
+    for p in bs_profiles.keys():
+        res[p] = {}
+        min = []
+        rec = []
+        for prop in bs_profiles[p]["min_props"]:
+            if "|" in prop:
+                shacl_alt = f'[ sh:alternativePath (  {" ".join(prop.split("|"))} ) ]'
+                min.append(shacl_alt)
+            else:
+                min.append(prop)
+
+        for prop in bs_profiles[p]["rec_props"]:
+            if "|" in prop:
+                shacl_alt = f'[ sh:alternativePath (  {" ".join(prop.split("|"))} ) ]'
+                rec.append(shacl_alt)
+            else:
+                rec.append(prop)
+
+        res[p]["rec_props"] = rec
+        res[p]["min_props"] = min
+    return res
+
 bs_profiles = {
     "sc:SoftwareApplication": {
         "min_props": ["sc:name", "sc:description", "sc:url"],
@@ -168,7 +192,7 @@ bs_profiles = {
         ],
     },
     "sc:SoftwareSourceCode": {
-        "min_props": ["dct:conformsTo", "sc:creator", "sc:dateCreated", "bsc:input", "sc:license", "sc:name", "bsc:output", "sc:programmingLanguage", "sc:sdPublisher", "sc:url",  "sc:version"],
+        "min_props": ["dct:conformsTo", "sc:creator", "sc:dateCreated", "bsc:input|sc:input", "sc:license", "sc:name", "bsc:output|sc:output", "sc:programmingLanguage", "sc:sdPublisher", "sc:url",  "sc:version"],
         "rec_props": [
             "sc:citation",
             "sc:contributor",
@@ -192,7 +216,8 @@ bs_profiles = {
         "rec_props":["bsc:associatedDisease", "sc:description", "bsc:isEncodedByBioChemEntity", "bsc:taxonomicRange", "sc:url"]
     },
     "sc:SequenceAnnotation": {
-        "min_props":["dct:conformsTo", "bsc:sequenceLocation"],
+        # "min_props":["dct:conformsTo", "bsc:sequenceLocation"],
+        "min_props":["dct:conformsTo", "bsc:sequenceLocation|sc:sequenceLocation"],
         "rec_props":["bsc:creationMethod", "sc:description", "sc:image", "sc:name", "sc:sameAs", "bsc:sequenceOrientation", "bsc:sequenceValue", "sc:url"]
     },
     "sc:SequenceRange": {
@@ -200,6 +225,9 @@ bs_profiles = {
         "rec_props":["bsc:endUncertainty", "bsc:startUncertainty"]
     }
 }
+
+bs_profiles = gen_shacl_alternatives(bs_profiles)
+
 
 #bs_profiles = generate_profiles_from_files()
 
@@ -274,6 +302,8 @@ def gen_SHACL_from_profile(shape_name, target_classes, min_props, rec_props):
         .
     """
 
+    #[sh: alternativePath(ex:father ex: mother  )]
+
     template = Template(shape_template)
     shape = template.render(
         shape_name=shape_name,
@@ -281,7 +311,7 @@ def gen_SHACL_from_profile(shape_name, target_classes, min_props, rec_props):
         min_props=min_props,
         rec_props=rec_props,
     )
-    # print(shape)
+    print(shape)
 
     # todo try catch to validate the generated shape
     # g = ConjunctiveGraph()
