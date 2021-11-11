@@ -154,7 +154,8 @@ class GenSHACLTestCase(unittest.TestCase):
 
                 bs_id = profile["@graph"][0]["@id"]
                 bs_id = "sc:" + profile["@graph"][0]["rdfs:label"]
-                print("*** Storing profile: " + bs_id)
+                bs_id = profile["@graph"][0]["rdfs:subClassOf"]["@id"]
+                print("*** Storing profile: " + profile["@graph"][0]["@id"])
                 # print("rdfs:label = " + profile["@graph"][0]["rdfs:label"])
                 print("rdfs:subClassOf = " + profile["@graph"][0]["rdfs:subClassOf"]["@id"])
                 bs_profiles[bs_id] = {
