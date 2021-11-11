@@ -300,6 +300,7 @@ def validate_any_from_KG(kg):
 
     # list classes
     for s, p, o in kg.triples((None, RDF.type, None)):
+        print()
         print(f"{s.n3(kg.namespace_manager)} is a {o.n3(kg.namespace_manager)}")
         if o.n3(kg.namespace_manager) in bs_profiles.keys():
             print()
@@ -332,6 +333,7 @@ def validate_any_from_RDF(input_url, rdf_syntax):
 
     # list classes
     for s, p, o in kg.triples((None, RDF.type, None)):
+        print()
         print(f"{s.n3(kg.namespace_manager)} is a {o.n3(kg.namespace_manager)}")
         if o.n3(kg.namespace_manager) in bs_profiles.keys():
             print()
@@ -366,6 +368,7 @@ def validate_any_from_microdata(input_url):
 
     # list classes
     for s, p, o in kg.triples((None, RDF.type, None)):
+        print()
         print(f"{s.n3(kg.namespace_manager)} is a {o.n3(kg.namespace_manager)}")
         # print(o.n3(kg.namespace_manager))
         # print(bs_profiles.keys())

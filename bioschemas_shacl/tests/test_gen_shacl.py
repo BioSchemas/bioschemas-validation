@@ -13,6 +13,7 @@ from bioschemas_profile_shape.bioschemas_shape_gen import validate_shape_from_RD
 from bioschemas_profile_shape.bioschemas_shape_gen import validate_any_from_RDF
 from bioschemas_profile_shape.bioschemas_shape_gen import validate_any_from_microdata
 from bioschemas_profile_shape.bioschemas_shape_gen import validate_shape_from_microdata
+from bioschemas_profile_shape.bioschemas_shape_gen import generate_profiles_from_files
 
 
 
@@ -140,54 +141,41 @@ class GenSHACLTestCase(unittest.TestCase):
         )
 
     def test_read_profiles_from_files(self):
-        profile_files = []
-
-        # get list of path of .json bioschemas profiles
-        dir_path = os.path.join(os.path.dirname(__file__), '../data/specifications')
-        for (sub_dir_path, dirnames, filenames) in walk(dir_path):
-            # print(dirnames)
-
-            for (dirpath, dirnames, filenames) in walk(sub_dir_path):
-                for filename in filenames:
-                    if filename.endswith("RELEASE.json"):
-                        profile_files.append(dirpath + "/" + filename)
-                        # print(dirpath + "/" + filename)
-            break
-
-        bs_profiles = {}
-        #retrieve and parse content of .json profiles files
-        for profile_file in profile_files:
-            print("****** READING Profile *******")
-            # print(profile_file)
-            with open(profile_file) as f:
-                profile = json.load(f)
-                # print(json.dumps(profile, indent=True))
-
-                bs_id = profile["@graph"][0]["@id"]
-                bs_id = "sc:" + profile["@graph"][0]["rdfs:label"]
-                bs_id = profile["@graph"][0]["rdfs:subClassOf"]["@id"]
-                print("*** Storing profile: " + profile["@graph"][0]["@id"])
-                # print("rdfs:label = " + profile["@graph"][0]["rdfs:label"])
-                print("rdfs:subClassOf = " + profile["@graph"][0]["rdfs:subClassOf"]["@id"])
-                bs_profiles[bs_id] = {
-                    "min_props": [],
-                    "rec_props": []
-                }
-                for g in profile["@graph"]:
-                    # print("*** Class: " + g["@id"])
-                    # schema_class = g["@id"]
-
-
-                    if ("$validation") in g.keys():
-                        for k in g["$validation"]["required"]:
-                            # print(f"required {k}")
-                            bs_profiles[bs_id]["min_props"].append("sc:" + k)
-                        if "recommended" in g["$validation"].keys():
-                            for k in g["$validation"]["recommended"]:
-                                # print(f"recommended {k}")
-                                bs_profiles[bs_id]["rec_props"].append("sc:" + k)
+        bs_profiles = generate_profiles_from_files()
         print(json.dumps(bs_profiles, indent=4, sort_keys=True))
-        # print(bs_profiles)
+
+    def test_workflow(self):
+        validate_any_from_microdata(
+            #input_url="https://workflowhub.eu/workflows/18"
+            input_url = "https://workflowhub.eu/workflows/3"
+        )
+
+    def test_disprot(self):
+        validate_any_from_microdata(
+            input_url = "https://disprot.org/DP00004"
+        )
+
+    def test_persons(self):
+        validate_any_from_microdata(
+            input_url="https://bedroesb.github.io/rdmkit/human_data.html"
+        )
+
+    def test_molecular_entity(self):
+        url = "https://www.metanetx.org/chem_info/MNXM680"
+        res = validate_any_from_microdata(
+            input_url=url
+        )
+
+        self.assertEqual(len(res[url]["warnings"]),1)
+        self.assertEqual(len(res[url]["errors"]), 0)
+
+    def test_training_material(self):
+        url = "https://tess.elixir-europe.org/materials/a-gentle-introduction-to-dsw-for-convergers"
+
+        res = validate_any_from_microdata(
+            input_url=url
+        )
+
 
 
 if __name__ == "__main__":
