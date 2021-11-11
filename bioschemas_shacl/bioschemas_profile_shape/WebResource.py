@@ -37,7 +37,7 @@ class WebResource:
                 print("ConnectionError, retrying...")
                 time.sleep(10)
 
-        requests_status_code = response.status_code
+        #requests_status_code = response.status_code
         html_source = response.content
 
         data = extruct.extract(
@@ -98,11 +98,6 @@ class WebResource:
             static_file_path = str(
                 (base_path / "static/data/jsonldcontext.json").resolve()
             )
-
-            # print()
-            # print("***************")
-            # print(jsonld_string)
-            # print("***************")
 
             for json_ld_annots in jsonld_string:
                 jsonld = json.loads(json_ld_annots)
