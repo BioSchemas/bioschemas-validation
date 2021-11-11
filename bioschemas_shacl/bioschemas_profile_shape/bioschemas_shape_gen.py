@@ -311,11 +311,7 @@ def gen_SHACL_from_profile(shape_name, target_classes, min_props, rec_props):
         min_props=min_props,
         rec_props=rec_props,
     )
-    print(shape)
-
-    # todo try catch to validate the generated shape
-    # g = ConjunctiveGraph()
-    # g.parse(data=shape, format='turtle')
+    # print(shape)
 
     return shape
 
