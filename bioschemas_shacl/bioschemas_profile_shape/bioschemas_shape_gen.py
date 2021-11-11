@@ -35,37 +35,26 @@ def generate_profiles_from_files():
         break
 
     bs_profiles = {}
+
     #retrieve and parse content of .json profiles files
     for profile_file in profile_files:
-        # print("****** READING Profile *******")
-        # print(profile_file)
+
         with open(profile_file) as f:
             profile = json.load(f)
-            # print(json.dumps(profile, indent=True))
 
             bs_id = profile["@graph"][0]["@id"]
-            bs_id = "sc:" + profile["@graph"][0]["rdfs:label"]
-            bs_id = profile["@graph"][0]["rdfs:subClassOf"]["@id"]
-            print("*** Storing profile: " + bs_id)
-            # print("rdfs:label = " + profile["@graph"][0]["rdfs:label"])
-            # print("rdfs:subClassOf = " + profile["@graph"][0]["rdfs:subClassOf"]["@id"])
             bs_profiles[bs_id] = {
                 "min_props": [],
                 "rec_props": []
             }
+
             for g in profile["@graph"]:
-                # print("*** Class: " + g["@id"])
-                # schema_class = g["@id"]
-
-
                 if ("$validation") in g.keys():
                     for k in g["$validation"]["required"]:
-                        # print(f"required {k}")
-                        bs_profiles[bs_id]["min_props"].append("sc:" + k)
+                        bs_profiles[bs_id]["min_props"].append("schema:" + k)
                     if "recommended" in g["$validation"].keys():
                         for k in g["$validation"]["recommended"]:
-                            # print(f"recommended {k}")
-                            bs_profiles[bs_id]["rec_props"].append("sc:" + k)
+                            bs_profiles[bs_id]["rec_props"].append("schema:" + k)
     return bs_profiles
 
 bs_profiles = {
@@ -141,9 +130,66 @@ bs_profiles = {
             "sc:url",
         ],
     },
+    "bsc:Gene": {
+        "min_props": ["sc:identifier", "sc:name", "dct:conformsTo"],
+        "rec_props": [
+            "sc:description",
+            "sc:encodesBioChemEntity",
+            "sc:isPartOfBioChemEntity",
+            "sc:url",
+        ],
+    },
+    "sc:Study":{
+        "min_props": ["sc:identifier", "sc:name", "dct:conformsTo", "sc:author", "sc:datePublished", "sc:description", "bsc:studyDomain", "sc:studySubject"],
+        "rec_props": [
+            "sc:about",
+            "sc:additionnalProperty",
+            "sc:citation",
+            "sc:creator",
+            "sc:dateCreated",
+            "sc:endDate",
+            "sc:keywords",
+            "sc:startDate",
+            "sc:studyLocation",
+            "bsc:studyProcess",
+            "sc:url"
+        ],
+    },
+    "sc:Person": {
+        "min_props": ["sc:description", "sc:name", "dct:conformsTo", "sc:mainEntityOfPage"],
+        "rec_props": [
+            "sc:email",
+            "bsc:expertise",
+            "sc:homeLocation",
+            "sc:image",
+            "sc:memberOf",
+            "bsc:orcid",
+            "sc:worksFor"
+        ],
+    },
+    "sc:SoftwareSourceCode": {
+        "min_props": ["dct:conformsTo", "sc:creator", "sc:dateCreated", "bsc:input", "sc:license", "sc:name", "bsc:output", "sc:programmingLanguage", "sc:sdPublisher", "sc:url",  "sc:version"],
+        "rec_props": [
+            "sc:citation",
+            "sc:contributor",
+            "sc:creativeWorkStatus",
+            "sc:description",
+            "sc:documentation",
+            "sc:funding",
+            "sc:hasPart",
+            "sc:isBasedOn",
+            "sc:keywords",
+            "sc:maintainer",
+            "sc:producer",
+            "sc:publisher",
+            "sc:runtimePlatform",
+            "sc:sofwtareRequirement",
+            "sc:targetProduct"
+        ],
+    },
 }
 
-bs_profiles = generate_profiles_from_files()
+#bs_profiles = generate_profiles_from_files()
 
 def checktype(obj):
     # This if statement makes sure input is a list that is not empty
@@ -193,7 +239,7 @@ def gen_SHACL_from_profile(shape_name, target_classes, min_props, rec_props):
 
         ns:{{shape_name}}
             a sh:NodeShape ;
-            #sh:targetSubjectsOf sc:name ;
+            #sh:targetSubjectsOf schema:name ;
             {% for c in target_classes %}
             sh:targetClass  {{c}} ;
             {% endfor %}
@@ -291,7 +337,7 @@ def validate_any_from_microdata(input_url):
     kg.namespace_manager.bind("dct", URIRef("http://purl.org/dc/terms/"))
 
     results = {}
-    # print(kg.serialize(format="turtle"))
+    print(kg.serialize(format="turtle"))
 
     # list classes
     for s, p, o in kg.triples((None, RDF.type, None)):
@@ -302,7 +348,6 @@ def validate_any_from_microdata(input_url):
         if o.n3(kg.namespace_manager) in bs_profiles.keys():
             print(f"Trying to validate {s} as a(n) {o} resource")
             shacl_shape = gen_SHACL_from_target_class(o.n3(kg.namespace_manager))
-            # print(shacl_shape)
             warnings, errors = validate_shape(
                 knowledge_graph=kg, shacl_shape=shacl_shape
             )
