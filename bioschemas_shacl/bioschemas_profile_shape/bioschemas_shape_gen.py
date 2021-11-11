@@ -187,6 +187,18 @@ bs_profiles = {
             "sc:targetProduct"
         ],
     },
+    "sc:Protein": {
+        "min_props":["dct:conformsTo", "sc:identifier", "sc:name"],
+        "rec_props":["bsc:associatedDisease", "sc:description", "bsc:isEncodedByBioChemEntity", "bsc:taxonomicRange", "sc:url"]
+    },
+    "sc:SequenceAnnotation": {
+        "min_props":["dct:conformsTo", "bsc:sequenceLocation"],
+        "rec_props":["bsc:creationMethod", "sc:description", "sc:image", "sc:name", "sc:sameAs", "bsc:sequenceOrientation", "bsc:sequenceValue", "sc:url"]
+    },
+    "sc:SequenceRange": {
+        "min_props":["dct:conformsTo", "bsc:rangeStart", "bsc:rangeEnd"],
+        "rec_props":["bsc:endUncertainty", "bsc:startUncertainty"]
+    }
 }
 
 #bs_profiles = generate_profiles_from_files()
@@ -290,10 +302,16 @@ def validate_any_from_KG(kg):
     for s, p, o in kg.triples((None, RDF.type, None)):
         print(f"{s.n3(kg.namespace_manager)} is a {o.n3(kg.namespace_manager)}")
         if o.n3(kg.namespace_manager) in bs_profiles.keys():
+            print()
             print(f"Trying to validate {s} as a(n) {o} resource")
             shacl_shape = gen_SHACL_from_target_class(o.n3(kg.namespace_manager))
+
+            sub_kg = ConjunctiveGraph()
+            for x, y, z in kg.triples((s, None, None)):
+                sub_kg.add((x, y, z))
+
             warnings, errors = validate_shape(
-                knowledge_graph=kg, shacl_shape=shacl_shape
+                knowledge_graph=sub_kg, shacl_shape=shacl_shape
             )
             results[str(s)] = {
                 "type": str(o),
@@ -316,10 +334,17 @@ def validate_any_from_RDF(input_url, rdf_syntax):
     for s, p, o in kg.triples((None, RDF.type, None)):
         print(f"{s.n3(kg.namespace_manager)} is a {o.n3(kg.namespace_manager)}")
         if o.n3(kg.namespace_manager) in bs_profiles.keys():
+            print()
             print(f"Trying to validate {s} as a(n) {o} resource")
             shacl_shape = gen_SHACL_from_target_class(o.n3(kg.namespace_manager))
+
+            sub_kg = ConjunctiveGraph()
+            for x, y, z in kg.triples((s, None, None)):
+                sub_kg.add((x, y, z))
+
+
             warnings, errors = validate_shape(
-                knowledge_graph=kg, shacl_shape=shacl_shape
+                knowledge_graph=sub_kg, shacl_shape=shacl_shape
             )
             results[str(s)] = {
                 "type": str(o),
@@ -346,10 +371,16 @@ def validate_any_from_microdata(input_url):
         # print(bs_profiles.keys())
 
         if o.n3(kg.namespace_manager) in bs_profiles.keys():
+            print()
             print(f"Trying to validate {s} as a(n) {o} resource")
             shacl_shape = gen_SHACL_from_target_class(o.n3(kg.namespace_manager))
+
+            sub_kg = ConjunctiveGraph()
+            for x, y, z in kg.triples((s, None, None)):
+                sub_kg.add((x, y, z))
+
             warnings, errors = validate_shape(
-                knowledge_graph=kg, shacl_shape=shacl_shape
+                knowledge_graph=sub_kg, shacl_shape=shacl_shape
             )
             results[str(s)] = {
                 "type": str(o),
@@ -358,7 +389,7 @@ def validate_any_from_microdata(input_url):
             }
         else:
             print(f"Could not find a suitable profile for {s} typed {o}")
-    print(len(kg))
+    #print(len(kg))
     return results
 
 
