@@ -170,7 +170,11 @@ class GenSHACLTestCase(unittest.TestCase):
         self.assertEqual(len(res[url]["errors"]), 0)
 
     def test_training_material(self):
+        # Microdata
         url = "https://tess.elixir-europe.org/materials/a-gentle-introduction-to-dsw-for-convergers"
+
+        # JSON-LD
+        url = "https://bioschemas.org/tutorials/what_why_bioschemas"
 
         res = validate_any_from_microdata(
             input_url=url

@@ -223,6 +223,10 @@ bs_profiles = {
     "sc:SequenceRange": {
         "min_props":["dct:conformsTo", "bsc:rangeStart", "bsc:rangeEnd"],
         "rec_props":["bsc:endUncertainty", "bsc:startUncertainty"]
+    },
+    "sc:CreativeWork": {
+        "min_props": ["dct:conformsTo", "sc:description", "sc:keywords", "sc:name"],
+        "rec_props": ["sc:about", "sc:abstract", "sc:audience", "sc:author", "sc:competencyRequired", "sc:educationalLevel", "sc:identifier", "sc:inLanguage", "sc:learningResourceType", "sc:license", "sc:mentions", "sc:teaches", "sc:timeRequired", "sc:url"]
     }
 }
 
