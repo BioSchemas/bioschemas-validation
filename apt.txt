@@ -1,2 +1,3 @@
+chromium-chromedriver
 libnss3
 libdbus-1-dev
