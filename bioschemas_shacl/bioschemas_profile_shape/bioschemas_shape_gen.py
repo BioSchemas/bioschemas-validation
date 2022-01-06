@@ -154,15 +154,6 @@ bs_profiles = {
             "sc:url",
         ],
     },
-    "bsc:Gene": {
-        "min_props": ["sc:identifier", "sc:name", "dct:conformsTo"],
-        "rec_props": [
-            "sc:description",
-            "sc:encodesBioChemEntity",
-            "sc:isPartOfBioChemEntity",
-            "sc:url",
-        ],
-    },
     "sc:Study":{
         "min_props": ["sc:identifier", "sc:name", "dct:conformsTo", "sc:author", "sc:datePublished", "sc:description", "bsc:studyDomain", "sc:studySubject"],
         "rec_props": [
