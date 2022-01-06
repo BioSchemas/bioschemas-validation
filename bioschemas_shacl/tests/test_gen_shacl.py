@@ -145,10 +145,11 @@ class GenSHACLTestCase(unittest.TestCase):
         print(json.dumps(bs_profiles, indent=4, sort_keys=True))
 
     def test_workflow(self):
-        validate_any_from_microdata(
-            #input_url="https://workflowhub.eu/workflows/18"
-            input_url = "https://workflowhub.eu/workflows/3"
-        )
+        url = "https://workflowhub.eu/workflows/3"
+        res = validate_any_from_microdata(input_url = url)
+        print(res)
+        self.assertEqual(len(res['https://workflowhub.eu/workflows/3?version=1']["errors"]), 1)
+        self.assertEqual(len(res['https://workflowhub.eu/workflows/3?version=1']["warnings"]), 12)
 
     def test_disprot(self):
         validate_any_from_microdata(
@@ -170,15 +171,21 @@ class GenSHACLTestCase(unittest.TestCase):
         self.assertEqual(len(res[url]["errors"]), 0)
 
     def test_training_material(self):
-        # Microdata
         url = "https://tess.elixir-europe.org/materials/a-gentle-introduction-to-dsw-for-convergers"
-
-        # JSON-LD
-        url = "https://bioschemas.org/tutorials/what_why_bioschemas"
-
         res = validate_any_from_microdata(
             input_url=url
         )
+
+    def test_data_catalog(self):
+        url = "https://www.metanetx.org/"
+        res = validate_any_from_microdata(
+            input_url=url
+        )
+
+    def test_data_catalog(self):
+        url = "http://www.corkoakdb.org/gene/35211"
+        res = validate_any_from_microdata(input_url=url)
+
 
 
 
