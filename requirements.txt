@@ -7,3 +7,4 @@ webdriver-manager==3.5.2
 selenium==3.141.0
 requests==2.26.0
 extruct==0.13.0
+rich==10.16.2
