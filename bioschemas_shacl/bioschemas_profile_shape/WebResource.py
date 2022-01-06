@@ -43,7 +43,7 @@ class WebResource:
         data = extruct.extract(
             html_source, syntaxes=["microdata", "rdfa", "json-ld"], errors="ignore"
         )
-        print(data)
+        # print(data)
         kg = ConjunctiveGraph()
 
         base_path = Path(__file__).parent.parent  ## current directory
@@ -101,10 +101,10 @@ class WebResource:
 
             for json_ld_annots in jsonld_string:
                 jsonld = json.loads(json_ld_annots)
-                print(jsonld)
+                # print(jsonld)
                 if isinstance(jsonld, list):
                     for el in jsonld:
-                        print(el.keys())
+                        # print(el.keys())
                         if "@context" in el.keys():
                             if "//schema.org" in el["@context"]:
                                 el["@context"] = static_file_path
