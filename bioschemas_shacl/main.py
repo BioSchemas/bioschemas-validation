@@ -5,8 +5,6 @@ import time
 from argparse import RawTextHelpFormatter
 from rich.console import Console
 from rich.table import Table
-from tabulate import tabulate
-from rich.text import Text
 
 from bioschemas_profile_shape.WebResource import WebResource
 from bioschemas_profile_shape.bioschemas_shape_gen import validate_any_from_microdata
