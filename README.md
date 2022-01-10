@@ -35,6 +35,7 @@ Bioschemas-shacl-validator, a command line tool to validate bisochemas annotated
 
 Usage :
 python main.py -u https://bgee.org/?page=gene&gene_id=ENSG00000274928
+```
 
 ## Tutorial presented at SWAT4LS'2022
 - slides: 
