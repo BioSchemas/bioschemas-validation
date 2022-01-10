@@ -1,5 +1,7 @@
 # bioschemas-validation [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/BioSchemas/bioschemas-validation/HEAD)
-This repository hosts the tool developped during the BioHackathon 2021 event. Special thanks to the contributors : 
+This repository hosts the tool developped during the BioHackathon 2021 event. 
+
+Special thanks to the contributors : 
 - Thomas Rosnet 
 - Ivan Mičetić 
 - Sebastien Moretti 
