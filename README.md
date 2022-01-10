@@ -38,8 +38,8 @@ python main.py -u https://bgee.org/?page=gene&gene_id=ENSG00000274928
 ```
 
 ## Tutorial presented at SWAT4LS'2022
-- slides: 
-- notebook: (https://github.com/BioSchemas/bioschemas-validation/tree/main/sandbox_notebooks) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/BioSchemas/bioschemas-validation/HEAD)
+- [slides](https://drive.google.com/file/d/1q8pDUyT4DXv9kvOw64FoPD4OiOIjZyOk/view?usp=sharing)
+- [notebook](https://github.com/BioSchemas/bioschemas-validation/tree/main/sandbox_notebooks) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/BioSchemas/bioschemas-validation/HEAD)
 
 ## Future works 
 - Generate SHACL constraints from JSON serialization (Data Discovery Engine)
