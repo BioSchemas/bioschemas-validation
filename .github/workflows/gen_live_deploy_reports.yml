@@ -4,10 +4,9 @@
 name: Live deploy reports
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 4 * * 0'
 
 permissions:
   contents: read
@@ -33,3 +32,17 @@ jobs:
     - name: Validation report
       run: |
         python scripts/gen_live_deploys_reports.py validate
+    - name: commit new data
+      env:
+        GITHUB_USER: ${{ secrets.GITHUB_USER }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+          git config --local user.email "bioschemas-validation-bot@github.com"
+          git config --local user.name "Bioschemas validation bot"
+          git add .
+          if git commit -m "Bioschemas Live Deploys harvesting and validation reports on $(date)"; then
+              git push origin HEAD
+              echo "successfully created new Bioschemas report"
+          else
+              echo "nothing new, exiting"            
+          fi
