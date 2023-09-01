@@ -28,10 +28,10 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Harvesting report
       run: |
-        python scripts/gen_live_deploys_reports.py check
+        python scripts/gen_live_deploys_reports.py check --all
     - name: Validation report
       run: |
-        python scripts/gen_live_deploys_reports.py validate
+        python scripts/gen_live_deploys_reports.py validate --all
     - name: commit new data
       env:
         GITHUB_USER: ${{ secrets.GITHUB_USER }}
