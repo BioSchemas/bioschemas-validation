@@ -29,7 +29,7 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Harvesting report
       run: |
-        python gen_live_deploys_reports.py check
+        python scripts/gen_live_deploys_reports.py check
     - name: Validation report
       run: |
-        python gen_live_deploys_reports.py validate
+        python scripts/gen_live_deploys_reports.py validate
