@@ -39,6 +39,7 @@ jobs:
       run: |
           git config --local user.email "bioschemas-validation-bot@github.com"
           git config --local user.name "Bioschemas validation bot"
+          git pull 
           git add .
           if git commit -m "Bioschemas Live Deploys harvesting and validation reports on $(date)"; then
               git push origin HEAD
