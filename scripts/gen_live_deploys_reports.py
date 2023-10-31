@@ -2,7 +2,7 @@ from rdflib import ConjunctiveGraph, URIRef
 import requests
 from requests.exceptions import InvalidURL, ConnectionError, ConnectTimeout
 import random
-import json
+import os
 from tqdm import tqdm
 import pandas as pd
 import click
@@ -60,7 +60,7 @@ def has_conforms_to(kg):
     return (None, conformsTo, None) in kg
 
 
-def check_live_deploy(url):
+def check_live_deploy(url, dump_flag):
     ld = url
     row = {"URL": ld}
     try:
@@ -70,6 +70,15 @@ def check_live_deploy(url):
         # print(kg.serialize(format="ntriples"))
         row["nb_triples"] = len(kg)
         row["has_conforms_to"] = has_conforms_to(kg)
+        if dump_flag:
+            with open("out.nq", "a") as out_file:
+                # kg.serialize(destination="out.nq", format="nquads")
+                try :
+                    nquads = kg.serialize(format="nquads")    
+                    out_file.write(nquads)
+                except Exception as e:
+                    print(f"N-quads serialization errror with url: {ld}")
+                    print(e)
     except InvalidURL as e:
         print(f"Invalid url: {ld}")
         row["info"] = f"Invalid url: {ld}"
@@ -101,19 +110,24 @@ def valid_live_deploy(url):
 
 
 @cli.command(
-    help="Checks that Bioschemas metadata is served on Bioschemas Live Deploy web pages. By default, 3 live deploys are randomly picked. "
+    help="Checks that Bioschemas metadata can be harvested on Bioschemas Live Deploy web pages. By default, 3 live deploys are randomly picked."
 )
 @click.option("--all", is_flag=True, help="Check all live deploys")
-def check(all):
+@click.option("--dump", is_flag=True, help="Dumps metadata in nquads")
+def check(all, dump):
     lds = get_live_deploys_urls()
 
     if not all:
         lds = random.sample(lds, 3)
+    
+    if dump:
+        if os.path.exists("out.nq"):
+            os.remove("out.nq")
 
     rows = []
     print(f"checking {len(lds)} live deploys")
     for ld in tqdm(lds):
-        row = check_live_deploy(ld)
+        row = check_live_deploy(ld, dump)
         rows.append(row)
     df1 = pd.DataFrame.from_records(rows)
     df1.to_csv("bioschemas_harvesting.csv")
