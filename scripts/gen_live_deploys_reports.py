@@ -89,6 +89,8 @@ def check_live_deploy(url, dump_flag):
 
 
 def valid_live_deploy(url):
+    property_errors = []
+    property_warnings = []
     rows = []
     ld = url
     try:
@@ -100,13 +102,23 @@ def valid_live_deploy(url):
             row["Reference profile"] = bs_valid[entity]["ref_profile"]
             row["Is valid"] = bs_valid[entity]["conforms"]
             row["Nb errors"] = len(bs_valid[entity]["errors"])
+            for e in bs_valid[entity]["errors"]:
+                error_row = {"property": e}
+                error_row["Reference profile"] = bs_valid[entity]["ref_profile"]
+                error_row["Evaluated entity"] = entity
+                property_errors.append(error_row)
             row["Nb warnings"] = len(bs_valid[entity]["warnings"])
+            for w in bs_valid[entity]["warnings"]:
+                warning_row = {"property": w}
+                warning_row["Reference profile"] = bs_valid[entity]["ref_profile"]
+                warning_row["Evaluated entity"] = entity
+                property_warnings.append(warning_row)
             row["Is the latest profile"] = bs_valid[entity]["latest_profile"]
             row["Is deprecated profile"] = bs_valid[entity]["deprecated"]
             rows.append(row)
     except Exception as e:
         print(f"Error while validating {ld}")
-    return rows
+    return rows, property_errors, property_warnings
 
 
 @cli.command(
@@ -146,14 +158,28 @@ def valid(all):
         lds = random.sample(lds, 3)
 
     rows = []
+    e_rows = []
+    w_rows = []
     print(f"checking {len(lds)} live deploys")
     for ld in tqdm(lds):
-        results = valid_live_deploy(ld)
+        results, prop_errors, prop_warnings = valid_live_deploy(ld)
         for r in results:
             rows.append(r)
+        for p in prop_errors:
+            e_rows.append(p)
+        for p in prop_warnings:
+            w_rows.append(p)
     df2 = pd.DataFrame.from_records(rows)
     df2.to_csv("bioschemas_validation.csv")
     df2.to_markdown("bioschemas_validation.md")
+    
+    df3 = pd.DataFrame.from_records(e_rows)
+    df3.to_csv("bioschemas_prop_errors.csv")
+    df3.to_markdown("bioschemas_prop_errors.md")
+    
+    df4 = pd.DataFrame.from_records(w_rows)
+    df4.to_csv("bioschemas_prop_warnings.csv")
+    df4.to_markdown("bioschemas_prop_warnings.md")
 
 
 if __name__ == "__main__":
